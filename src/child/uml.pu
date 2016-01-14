@@ -1,3 +1,0 @@
-@startuml
-あいうえお <|--|> Class02
-@enduml

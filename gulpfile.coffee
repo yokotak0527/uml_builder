@@ -1,49 +1,52 @@
 'use strict'
-plantuml =
-	path : '/Users/WPMC4/local/bin/plantuml.jar'
-	conf :
-		format : '-tsvg'
-gulp          = require('gulp')
-path          = require('path')
-server        = require('gulp-webserver')
-run           = require('gulp-run')
-
-serverRoot    = path.join(process.cwd(),'dest/')
-watchDir      = path.join(process.cwd(),'src/')
-watchFiles    = path.join(watchDir,'**/*.pu')
-dest          = path.join(process.cwd(),'dest')
+gulp       = require('gulp')
+path       = require('path')
+server     = require('gulp-webserver')
+run        = require('gulp-run')
+plumber    = require('gulp-plumber')
+serverRoot = path.join(process.cwd(),'dest/')
+watchDir   = path.join(process.cwd(),'src/')
+destDir    = path.join(process.cwd(),'dest/')
+watchFiles = path.join(watchDir,'**/*.pu')
+conf       =
+	server :
+		livereload : true
+		host       : '127.0.0.1'
+		port       : '8008'
+	plantuml :
+		path   : path.join(process.cwd(),'bin/plantuml.jar')
+		option : [
+			'-tpng'
+			'-charset UTF-8'
+		]
 
 # ==============================================================================
 # 処理
 # ==============================================================================
 makeUML = (file_path)->
-	dest_path = file_path.replace(watchDir,'').replace(/\/[a-z0-9_\-\^\~\]\:\;\[\(\)\S]+\.pu/i,'')
-	dest_path = path.join(dest,dest_path,'/')
-	console.log dest_path
-	cmd  = "java -jar #{plantuml.path}"
-	cmd += " -o #{dest_path} #{file_path}"
-	for key,val of plantuml.conf then cmd += " #{val}"
+	dest_path = file_path.replace(watchDir,'')
+	if dest_path.match(/\//) == null
+		dest_path = destDir
+	else
+		console.log dest_path
+		dest_path = dest_path.replace(/\/[a-z0-9_\-\^\~\]\:\;\[\(\)\S]+\.pu/i,'')
+		dest_path = path.join(destDir,dest_path,'/')
+	cmd  = "java -jar '#{conf.plantuml.path}'"
+	cmd += " -o '#{dest_path}' '#{file_path}'"
+	for val in conf.plantuml.option then cmd += " #{val}"
 	gulp.src(file_path)
+		.pipe(plumber())
 		.pipe(run(cmd))
 	return
 
 # ==============================================================================
-# gulp タスク
+# gulp tasks
 # ==============================================================================
-# サーバー立ち上げ
-# ------------------------------------------------------------------------------
 gulp.task('up',->
 	gulp.src(serverRoot)
-		.pipe(server(
-			livereload : true,
-			host       : '127.0.0.1'
-			port       : '8008'
-		))
+		.pipe(server(conf.server))
 	return
 )
-
-# ------------------------------------------------------------------------------
-# 監視
 # ------------------------------------------------------------------------------
 gulp.task('watch',()->
 	gulp.watch(watchFiles,(e)->
@@ -52,8 +55,5 @@ gulp.task('watch',()->
 	)
 	return
 )
-
-# ------------------------------------------------------------------------------
-# デフォルトタスク
-# ------------------------------------------------------------------------------
+# ==============================================================================
 gulp.task 'default', ['up', 'watch']
