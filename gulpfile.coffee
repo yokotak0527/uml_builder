@@ -3,9 +3,9 @@ gulp     = require('gulp')
 path     = require('path')
 server   = require('gulp-webserver')
 
-serverRoot = path.join(process.cwd(),'dest/')
-watchDir   = path.join(process.cwd(),'src/')
-destDir    = path.join(process.cwd(),'dest/')
+serverRoot = path.join(process.cwd(),'dest')
+watchDir   = path.join(process.cwd(),'src')
+destDir    = path.join(process.cwd(),'dest')
 watchFiles = path.join(watchDir,'**/*.pu')
 conf       =
 	server :
@@ -13,13 +13,12 @@ conf       =
 		host             : '127.0.0.1'
 		port             : '8008'
 		open             : true
-		path             : serverRoot
 		directoryListing : true
 	plantuml :
 		path    : path.join(process.cwd(),'bin/plantuml.jar')
 		prefix  : 'pu'
 		option  : [
-			'-tsvg'
+			'-tpng'
 			'-charset UTF-8'
 		]
 	exec :
@@ -34,15 +33,15 @@ conf       =
 # ==============================================================================
 # 処理
 # ==============================================================================
-makeUML = (file_path)->
-	exec      = require('gulp-exec')
-	file_dir  = path.dirname(file_path).replace(watchDir,'')
-	file_name = path.basename(file_path,".#{conf.plantuml.prefix}")
-	dest_path = path.join(destDir,file_dir)
+makeUML = (filePath)->
+	exec     = require('gulp-exec')
+	fileDir  = path.dirname(filePath).replace(watchDir,'')
+	file_name = path.basename(filePath,".#{conf.plantuml.prefix}")
+	dest_path = path.join(destDir,fileDir)
 	cmd  = "java -jar '#{conf.plantuml.path}'"
-	cmd += " -o '#{dest_path}' '#{file_path}'"
+	cmd += " -o '#{dest_path}' '#{filePath}'"
 	for val in conf.plantuml.option then cmd += " #{val}"
-	gulp.src(file_path).pipe(exec(cmd,conf.exec.option))
+	gulp.src(filePath).pipe(exec(cmd,conf.exec.option))
 		.pipe(exec.reporter(conf.exec.report))
 	return
 
