@@ -1,8 +1,9 @@
 skinparam componentStyle uml2
 skinparam classStyle uml2
 skinparam shadowing false
-skinparam defaultFontName Ricty
-skinparam padding 2
+skinparam defaultFontName “Yu Gothic”
+skinparam defaultFontSize 18
+skinparam padding 3
 skinparam classBorderThickness 1
 skinparam objectBorderThickness 1
 skinparam packageBorderThickness 1
@@ -11,7 +12,7 @@ skinparam noteBorderThickness 1
 skinparam monochrome true
 
 skinparam roundcorner 0
-skinparam dpi 111
+skinparam dpi 72
 skinparam nodesep 10
 skinparam ranksep 10
 skinparam classAttributeIconSize 0
